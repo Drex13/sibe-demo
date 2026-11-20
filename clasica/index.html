@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>SIBE Bienestar Estudiantil</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,600&display=swap" rel="stylesheet">
+<style>
+/* Plan: teal sobre grises azulados, serenos. Rojo solo para riesgo crítico.
+   Layout: barra lateral en escritorio, navegación inferior en celular. */
+:root{
+  --bg:#F2F6F7; --surface:#FFFFFF; --ink:#14262D; --muted:#566B73; --line:#D8E3E6;
+  --accent:#0F766E; --accent-ink:#FFFFFF; --accent-soft:#DDF1EE;
+  --crit:#B42318; --crit-soft:#FDE7E4; --warn:#9A4A06; --warn-soft:#FEF0C7; --ok:#067647; --ok-soft:#D8F5E4;
+  --display:'Fraunces',Georgia,serif; --body:'Figtree',system-ui,-apple-system,'Segoe UI',sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0E1A1F; --surface:#15262D; --ink:#E6EFF1; --muted:#93A9B0; --line:#274049;
+    --accent:#4FD1C0; --accent-ink:#06211D; --accent-soft:#123A37;
+    --crit:#FF8A7A; --crit-soft:#3B1A16; --warn:#F5B454; --warn-soft:#3A2A10; --ok:#5FD6A0; --ok-soft:#11331F;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0E1A1F; --surface:#15262D; --ink:#E6EFF1; --muted:#93A9B0; --line:#274049;
+  --accent:#4FD1C0; --accent-ink:#06211D; --accent-soft:#123A37;
+  --crit:#FF8A7A; --crit-soft:#3B1A16; --warn:#F5B454; --warn-soft:#3A2A10; --ok:#5FD6A0; --ok-soft:#11331F;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--ink);font:400 16px/1.5 var(--body);-webkit-text-size-adjust:100%}
+h1,h2,h3{font-family:var(--display);font-weight:600;margin:0;text-wrap:balance;letter-spacing:-.01em}
+h1{font-size:26px;line-height:1.2} h2{font-size:21px;line-height:1.25} h3{font-size:17px;line-height:1.3}
+p{margin:0}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:6px}
+.app{display:grid;grid-template-rows:auto 1fr auto;height:100%}
+.top{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;justify-content:space-between;padding:10px 16px;background:var(--surface);border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--display);font-weight:600;font-size:18px}
+.logo{width:30px;height:30px;border-radius:9px;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-size:15px;font-family:var(--body);font-weight:700}
+.demo{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted)}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:10px;padding:3px;background:var(--bg)}
+.seg button{border:0;background:transparent;padding:6px 12px;border-radius:7px;font-size:14px;font-weight:600;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.body{display:grid;grid-template-columns:1fr;min-height:0}
+.side{display:none}
+main{overflow-y:auto;padding:18px 16px 28px;min-height:0}
+.wrap{max-width:860px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+.bottom{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
+.nav-btn{border:0;background:transparent;padding:10px 4px;font-size:12px;font-weight:600;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:3px}
+.nav-btn svg{width:22px;height:22px}
+.nav-btn[aria-current="page"]{color:var(--accent)}
+@media (min-width:860px){
+  .body{grid-template-columns:230px 1fr}
+  .side{display:flex;flex-direction:column;gap:4px;padding:16px 12px;background:var(--surface);border-right:1px solid var(--line)}
+  .side .nav-btn{flex-direction:row;gap:10px;font-size:15px;padding:10px 12px;border-radius:10px;justify-content:flex-start}
+  .side .nav-btn[aria-current="page"]{background:var(--accent-soft)}
+  .bottom{display:none}
+  main{padding:26px 28px 40px}
+}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px}
+.row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.between{justify-content:space-between}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.muted{color:var(--muted)} .small{font-size:14px} .xs{font-size:12px}
+.btn{border:1px solid var(--line);background:var(--surface);padding:10px 16px;border-radius:10px;font-weight:600;min-height:44px}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn.danger{background:var(--crit);color:#fff;border-color:var(--crit)}
+.btn.sm{min-height:36px;padding:6px 12px;font-size:14px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:2px 10px;border-radius:99px;font-size:12px;font-weight:700;white-space:nowrap}
+.p-crit{background:var(--crit-soft);color:var(--crit)} .p-high{background:var(--warn-soft);color:var(--warn)}
+.p-med{background:var(--accent-soft);color:var(--accent)} .p-ok{background:var(--ok-soft);color:var(--ok)} .p-n{background:var(--bg);color:var(--muted);border:1px solid var(--line)}
+.help{display:flex;gap:10px;align-items:flex-start;background:var(--crit-soft);color:var(--ink);border:1px solid var(--crit);border-radius:12px;padding:12px 14px}
+.help b{color:var(--crit)}
+.tile{display:flex;flex-direction:column;gap:2px}
+.tile .n{font-family:var(--display);font-size:32px;font-weight:600;line-height:1.1;font-variant-numeric:tabular-nums}
+.link{display:flex;gap:12px;align-items:center;text-align:left;width:100%;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px}
+.link:hover{border-color:var(--accent)}
+.ico{width:40px;height:40px;border-radius:12px;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;flex:none}
+.ico svg{width:22px;height:22px}
+.chat{display:flex;flex-direction:column;gap:8px;padding:4px 0}
+.msg{max-width:82%;padding:9px 12px;border-radius:14px;background:var(--surface);border:1px solid var(--line);align-self:flex-start}
+.msg .who{font-size:12px;font-weight:700;color:var(--muted);margin-bottom:1px}
+.msg.me{align-self:flex-end;background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.msg.me .who{color:inherit;opacity:.85}
+.msg.ai{background:var(--accent-soft);border-color:transparent}
+.msg.sys{align-self:center;max-width:100%;background:transparent;border:1px dashed var(--line);color:var(--muted);font-size:13px;text-align:center}
+.composer{display:flex;gap:8px;position:sticky;bottom:0;background:var(--bg);padding-top:8px}
+.composer input,.field,select,textarea{font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 12px;min-height:44px;width:100%}
+.composer input{flex:1}
+textarea{min-height:90px;resize:vertical}
+label{font-weight:600;font-size:14px;display:block;margin-bottom:4px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1px solid var(--accent);color:var(--accent);background:transparent;border-radius:99px;padding:6px 14px;font-weight:600;font-size:14px;min-height:36px}
+.chip:hover{background:var(--accent-soft)}
+.list{display:flex;flex-direction:column;gap:10px}
+.item{display:flex;gap:12px;align-items:flex-start;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--surface);width:100%;text-align:left}
+.item.sel{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft)}
+.stripe{width:4px;align-self:stretch;border-radius:4px;flex:none}
+.s-crit{background:var(--crit)} .s-high{background:var(--warn)} .s-med{background:var(--accent)} .s-low{background:var(--ok)}
+.tl{list-style:none;margin:0;padding:0 0 0 18px;border-left:2px solid var(--line);display:flex;flex-direction:column;gap:14px}
+.tl li{position:relative}
+.tl li::before{content:"";position:absolute;left:-25px;top:6px;width:12px;height:12px;border-radius:50%;background:var(--accent);border:2px solid var(--surface)}
+.tl li.c::before{background:var(--crit)}
+.consent{max-width:640px;margin:0 auto}
+.consent ul{padding-left:20px;margin:8px 0}
+.note{font-size:13px;color:var(--muted);border-left:3px solid var(--accent);padding:4px 10px}
+.chart text{fill:var(--muted);font:12px var(--body)}
+.hint{background:var(--warn-soft);color:var(--ink);border-radius:10px;padding:8px 12px;font-size:13px}
+.toast{position:fixed;left:50%;bottom:84px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:10px;font-weight:600;font-size:14px;z-index:5;max-width:90%}
+@media (min-width:860px){.toast{bottom:28px}}
+@media (prefers-reduced-motion:no-preference){main>.wrap{animation:in .25s ease-out}@keyframes in{from{opacity:.4;transform:translateY(4px)}}}
+</style>
+<style>
+/* Franja de aviso añadida para la publicación web. Body en columna para que la franja no empuje la navegación fuera de la pantalla. */
+body{display:flex;flex-direction:column}
+.app{flex:1 1 auto;min-height:0;height:auto}
+.aviso-demo{flex:none;padding:4px 16px;font:500 12px/1.4 var(--body);color:var(--muted);background:var(--accent-soft);border-bottom:1px solid var(--line);text-align:center}
+</style>
+</head>
+<body>
+<p class="aviso-demo" role="note">Prototipo académico · Datos ficticios · No es un servicio real de atención</p>
+<div class="app" id="app"></div>
+<script>
+/* ---------- Datos simulados ---------- */
+const WEEKS=['S1','S2','S3','S4','S5','S6','S7','S8'];
+const STUDENTS=[
+ {id:'s1',name:'Laura Gómez',prog:'Ingeniería Civil',sem:6,alias:'Luciérnaga_14',series:[3.6,3.4,3.1,2.8,2.4,2.2,1.9,1.6],
+  events:[['Esta semana','Lenguaje de desesperanza en la sala Ansiedad. Alerta crítica generada.',1],['Hace 2 semanas','Menciona insomnio y aislamiento de su grupo de estudio.',0],['Hace 5 semanas','Primer ingreso. Ánimo estable, estrés por parciales.',0]]},
+ {id:'s2',name:'Andrés Ruiz',prog:'Derecho',sem:4,alias:'Roble_08',series:[3.0,3.2,2.9,2.6,2.5,2.4,2.3,2.2],
+  events:[['Esta semana','Descenso sostenido del ánimo durante 6 semanas.',0],['Hace 3 semanas','Habla de presión familiar y carga académica.',0]]},
+ {id:'s3',name:'Camila Ortega',prog:'Medicina',sem:8,alias:'Marea_31',series:[2.8,3.0,2.7,2.9,2.6,2.8,2.5,2.7],
+  events:[['Esta semana','Remisión de un docente por cambios de comportamiento en clase.',0],['Hace 4 semanas','Ánimo variable, participa en sala de estrés académico.',0]]},
+ {id:'s4',name:'Sebastián Muñoz',prog:'Ing. Electrónica',sem:8,alias:'Faro_22',series:[2.1,2.3,2.6,2.8,3.2,3.4,3.6,3.9],
+  events:[['Esta semana','Mejoría sostenida. Asistió a su cita de seguimiento.',0]]},
+ {id:'s5',name:'Valentina Ríos',prog:'Música',sem:3,alias:'Brisa_05',series:[3.8,3.7,3.9,3.6,3.8,3.9,3.7,4.0],
+  events:[['Esta semana','Ánimo estable. Participa como apoyo en sala general.',0]]}
+];
+const ME={alias:'Colibrí_27',name:'Mateo Herrera',series:[2.6,2.9,2.7,3.1,3.0,3.4,3.3,3.6],
+ weekly:[['Esta semana','Hablaste de cansancio por los parciales, pero también de un buen día con tu grupo. Tu ánimo va subiendo.'],['Semana pasada','Dormiste poco y lo compartiste en la sala de estrés académico. Varias personas te respondieron.'],['Hace 4 semanas','Empezaste a usar SIBE. Tu ánimo estaba más bajo que ahora.']]};
+const ROOMS=[
+ {id:'r1',name:'Ansiedad',desc:'Para quien siente la mente acelerada o miedo constante.',n:42,seed:[['Marea_31','Hoy me costó mucho entrar a clase. Sentía el pecho apretado.'],['Faro_22','Te entiendo. A mí me ayudó respirar contando hasta 4 antes de entrar.'],['Brisa_05','Gracias por contarlo. Aquí no estás solo/a.']]},
+ {id:'r2',name:'Estrés académico',desc:'Parciales, entregas y carga de materias.',n:67,seed:[['Roble_08','Tengo tres entregas el mismo día y no sé por dónde empezar.'],['Faro_22','A mí me sirvió escribir todo y ordenar por fecha. Respira, se puede.']]},
+ {id:'r3',name:'Ánimo bajo',desc:'Tristeza, desgano o sensación de vacío.',n:31,seed:[['Luciérnaga_14','Últimamente no tengo ganas de nada, ni de lo que antes me gustaba.'],['Brisa_05','Gracias por escribirlo. A veces ayuda hablar con alguien de Salud Integral.']]},
+ {id:'r4',name:'Sala general',desc:'Conversación abierta, sin tema fijo.',n:118,seed:[['Colibrí_27','Hola a todos, ¿cómo les fue esta semana?'],['Marea_31','Pesada, pero hoy fue mejor. ¿Y a ti?']]}
+];
+const DEPS={ps:'PermaneSer',si:'Salud Integral'};
+const SLOTS=['Lun 23 nov · 9:00','Mar 24 nov · 14:00','Mié 25 nov · 10:30'];
+const CRIT=/(hacerme da[ñn]o|hacer da[ñn]o|quitarme la vida|no quiero vivir|suicid|matarme|acabar con todo|ya no quiero estar|mejor no estar)/i;
+
+/* ---------- Estado ---------- */
+const S={
+ role:'student',view:'home',consent:null,room:null,
+ roomLog:{},ai:[{t:'ai',x:'Hola, soy la consejera de SIBE. Soy una inteligencia artificial, no una persona ni un profesional de la salud. Puedo escucharte, darte ideas para sentirte mejor y ayudarte a agendar una cita. ¿Cómo te sientes hoy?'}],aiFlow:null,
+ alerts:[
+  {id:'a1',sid:'s1',lvl:'crit',src:'Sala Ansiedad',when:'hace 12 min',st:'Nueva',ex:'"Siento que ya no puedo con nada y a veces pienso que sería mejor no estar."'},
+  {id:'a2',sid:'s2',lvl:'high',src:'Tendencia del perfil',when:'hace 3 h',st:'Nueva',ex:'Ánimo en descenso sostenido durante 6 semanas consecutivas.'},
+  {id:'a3',sid:'s3',lvl:'med',src:'Remisión de docente',when:'ayer',st:'En gestión',ex:'El docente observó ausencias y cambios de comportamiento en clase.'}],
+ sel:'a1',slotFor:null,
+ appts:[{who:'Sebastián Muñoz',dep:'Salud Integral',when:'Jue 19 nov · 16:00',st:'Confirmada'},{who:'Camila Ortega',dep:'PermaneSer',when:'Vie 20 nov · 11:00',st:'Confirmada'}],
+ toast:null
+};
+const $=s=>document.querySelector(s);
+const esc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const stu=id=>STUDENTS.find(s=>s.id===id);
+const LV={crit:['Crítica','p-crit','s-crit'],high:['Alta','p-high','s-high'],med:['Media','p-med','s-med']};
+
+/* ---------- Iconos ---------- */
+const I={
+ home:'<path d="M3 11l9-8 9 8M5 10v10h14V10"/>',
+ rooms:'<path d="M4 5h16v11H9l-5 4z"/>',
+ ai:'<circle cx="12" cy="12" r="9"/><path d="M8 14s1.5 2 4 2 4-2 4-2M9 9.5h.01M15 9.5h.01"/>',
+ proc:'<path d="M3 17l5-6 4 3 8-9M3 21h18"/>',
+ panel:'<rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/>',
+ cal:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>',
+ send:'<path d="M4 12l16-8-6 16-3-7z"/>',
+ book:'<path d="M5 4h11a3 3 0 013 3v13H8a3 3 0 01-3-3zM5 17a3 3 0 013-3h11"/>',
+ heart:'<path d="M12 20s-8-5-8-11a4.5 4.5 0 018-2.5A4.5 4.5 0 0120 9c0 6-8 11-8 11z"/>'
+};
+const ic=n=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${I[n]}</svg>`;
+
+/* ---------- Gráfica de ánimo ---------- */
+function chart(series,h=190){
+ const w=600,L=34,R=12,T=12,B=26,pw=w-L-R,ph=h-T-B;
+ const x=i=>L+pw*i/(series.length-1), y=v=>T+ph*(1-(v-1)/4);
+ const pts=series.map((v,i)=>[x(i),y(v)]);
+ const line=pts.map((p,i)=>(i?'L':'M')+p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' ');
+ const area=line+` L${x(series.length-1)} ${T+ph} L${L} ${T+ph}Z`;
+ const last=pts[pts.length-1], v=series[series.length-1];
+ const col=v<2.2?'var(--crit)':'var(--accent)';
+ let g='';
+ [[1,'Muy bajo'],[3,'Medio'],[5,'Muy bien']].forEach(([n,t])=>{g+=`<line x1="${L}" x2="${w-R}" y1="${y(n)}" y2="${y(n)}" stroke="var(--line)" stroke-dasharray="3 4"/><text x="${L-6}" y="${y(n)+4}" text-anchor="end">${n}</text>`;});
+ const xl=series.map((_,i)=>`<text x="${x(i)}" y="${h-6}" text-anchor="middle">${WEEKS[i]}</text>`).join('');
+ return `<svg class="chart" viewBox="0 0 ${w} ${h}" width="100%" role="img" aria-label="Estado de ánimo por semana, de ${series[0]} a ${v} sobre 5">${g}${xl}<path d="${area}" fill="${col}" opacity=".12"/><path d="${line}" fill="none" stroke="${col}" stroke-width="2.5" stroke-linejoin="round"/><circle cx="${last[0]}" cy="${last[1]}" r="6" fill="${col}" stroke="var(--surface)" stroke-width="2"/><text x="${last[0]-10}" y="${last[1]-12}" text-anchor="end" style="fill:${col};font-weight:700">${v.toFixed(1)}</text></svg>`;
+}
+const trendTxt=s=>{const d=s[s.length-1]-s[0];return d>0.5?['Mejorando','p-ok']:d<-0.5?['En descenso','p-crit']:['Estable','p-n'];};
+
+/* ---------- Lógica ---------- */
+function addAlert(sid,lvl,src,ex){S.alerts.unshift({id:'a'+Date.now(),sid,lvl,src,when:'ahora',st:'Nueva',ex});}
+function toast(t){S.toast=t;render();setTimeout(()=>{S.toast=null;render();},2600);}
+function helpBox(){return `<div class="help" role="alert"><div>${ic('heart').replace('<svg','<svg width="22" height="22" style="color:var(--crit)"')}</div><div><b>No estás solo/a. Hay ayuda ahora mismo.</b><p class="small">Llama a la <b>Línea 106</b> (apoyo emocional) o a la <b>Línea 123</b> (emergencias). Un profesional de la universidad fue notificado y puede contactarte si tú lo permites.</p></div></div>`;}
+function aiReply(txt){
+ const t=txt.toLowerCase();
+ if(CRIT.test(txt)){addAlert('me','crit','Chat con IA',`"${txt}"`);return {x:'Gracias por decírmelo, lo que sientes importa. Quiero que estés a salvo: por favor llama ahora a la Línea 106 o a la 123. Avisé a una persona del equipo de bienestar para que te acompañe. ¿Quieres que te ayude a agendar una cita pronto?',crisis:1,chips:['Sí, agendar cita']};}
+ if(/cita|psic|profesional|agendar/.test(t)||txt==='Sí, agendar cita'){S.aiFlow='dep';return {x:'Claro. ¿Con qué dependencia quieres la cita?',chips:[DEPS.ps,DEPS.si]};}
+ if(/ansios|nervios|p[aá]nico/.test(t))return {x:'La ansiedad es muy común en época de parciales. Prueba esto: inhala 4 segundos, sostén 4 y exhala 6, durante un minuto. Si quieres, también puedes entrar a la sala Ansiedad. ¿Quieres hablar con un profesional?',chips:['Agendar cita']};
+ if(/estr[eé]s|parcial|entrega|examen/.test(t))return {x:'Tanto en tan poco tiempo agota. Divide lo pendiente por fecha y elige solo una tarea para la próxima hora. Descansar también es parte de estudiar.',chips:['Agendar cita']};
+ if(/dormir|sue[ñn]o|insomnio/.test(t))return {x:'Dormir poco empeora el ánimo. Intenta apagar pantallas 30 minutos antes de acostarte y mantener un horario fijo. Si dura más de dos semanas, vale la pena hablarlo con un profesional.',chips:['Agendar cita']};
+ if(/triste|vac[ií]o|sin ganas|solo|sola/.test(t))return {x:'Siento que estés pasando por eso. No tienes que cargarlo en silencio. Contarlo ya es un paso. ¿Quieres que te ayude a hablar con alguien de bienestar?',chips:['Agendar cita']};
+ return {x:'Te escucho. Cuéntame un poco más, ¿qué ha sido lo más difícil de esta semana?'};
+}
+function chipClick(v){
+ S.ai.push({t:'me',x:v});
+ if(S.aiFlow==='dep'&&(v===DEPS.ps||v===DEPS.si)){S.aiFlow={dep:v};S.ai.push({t:'ai',x:`Perfecto, ${v}. Estos son los horarios disponibles:`,chips:SLOTS});}
+ else if(S.aiFlow&&S.aiFlow.dep&&SLOTS.includes(v)){S.appts.unshift({who:ME.name,dep:S.aiFlow.dep,when:v,st:'Solicitada'});S.ai.push({t:'ai',x:`Listo. Tu cita con ${S.aiFlow.dep} quedó solicitada para ${v}. Recibirás la confirmación por tu correo institucional.`});S.aiFlow=null;}
+ else{const r=aiReply(v);S.ai.push({t:'ai',x:r.x,crisis:r.crisis,chips:r.chips});}
+ render(true);
+}
+function send(kind){
+ const inp=$('#msg'); const v=inp.value.trim(); if(!v)return; inp.value='';
+ if(kind==='ai'){S.ai.push({t:'me',x:v});const r=aiReply(v);S.ai.push({t:'ai',x:r.x,crisis:r.crisis,chips:r.chips});}
+ else{const log=S.roomLog[S.room]||(S.roomLog[S.room]=[]);log.push({a:ME.alias,x:v,me:1});
+  if(CRIT.test(v)){const rn=ROOMS.find(r=>r.id===S.room).name;addAlert('me','crit','Sala '+rn,`"${v}"`);log.push({sys:1,x:'Solo tú ves esto',crisis:1});}}
+ render(true);
+}
+
+/* ---------- Vistas: estudiante ---------- */
+function consentView(){return `<div class="consent wrap"><div class="card"><span class="pill p-med">Antes de empezar</span><h1 style="margin:10px 0 8px">Tu espacio seguro, con cuidado</h1>
+<p class="muted">SIBE existe para acompañarte. Para eso, necesitamos que sepas con claridad qué pasa con lo que escribes.</p>
+<ul class="small"><li><b>Otros estudiantes</b> solo ven tu alias (${ME.alias}), nunca tu nombre.</li>
+<li>Una <b>IA</b> analiza tus mensajes para estimar tu estado de ánimo y detectar señales de riesgo.</li>
+<li><b>PermaneSer y Salud Integral</b> ven un resumen, tu línea de tiempo y las alertas. No leen tus chats completos.</li>
+<li>Si detectamos riesgo, <b>un profesional puede contactarte</b> para ofrecerte una cita.</li>
+<li>Tus datos son sensibles y se tratan según la Ley 1581 de 2012.</li></ul>
+<div class="note">Esta herramienta es de apoyo y no reemplaza la atención de un profesional.</div>
+<div class="row" style="margin-top:16px"><button class="btn primary" data-act="consent" data-v="full">Acepto y quiero participar</button><button class="btn" data-act="consent" data-v="limited">Solo ver recursos de ayuda</button></div></div></div>`;}
+function limited(){return `<div class="wrap"><div class="card"><h2>Esta función necesita tu autorización</h2><p class="muted" style="margin:6px 0 12px">Las salas y la consejera funcionan con el seguimiento activo. Mientras tanto, puedes usar los recursos de ayuda.</p><button class="btn primary" data-act="consent" data-v="full">Aceptar seguimiento</button></div>${helpMini()}</div>`;}
+function helpMini(){return `<div class="card"><h3>Recursos de ayuda</h3><ul class="small" style="padding-left:20px;margin:8px 0 0"><li>Línea 106: apoyo emocional.</li><li>Línea 123: emergencias.</li><li>Salud Integral y PermaneSer: atención en la universidad.</li></ul></div>`;}
+function homeV(){
+ const mine=S.appts.filter(a=>a.who===ME.name);
+ return `<div class="wrap"><div><h1>Hola, ${ME.alias.split('_')[0]}</h1><p class="muted">Es un buen momento para tomarte un respiro. ¿Cómo estás hoy?</p></div>
+ <div class="card"><h3>Chequeo rápido</h3><div class="chips" style="margin-top:10px">${['😞 Mal','😕 Regular','🙂 Bien','😄 Muy bien'].map((m,i)=>`<button class="chip" data-act="mood" data-v="${i}">${m}</button>`).join('')}</div></div>
+ <div class="list">
+  <button class="link" data-act="go" data-v="rooms"><span class="ico">${ic('rooms')}</span><span><b>Salas de chat anónimas</b><br><span class="small muted">Habla con otros estudiantes que te entienden.</span></span></button>
+  <button class="link" data-act="go" data-v="ai"><span class="ico">${ic('ai')}</span><span><b>Consejera IA</b><br><span class="small muted">Consejos y ayuda para agendar una cita.</span></span></button>
+  <button class="link" data-act="go" data-v="process"><span class="ico">${ic('proc')}</span><span><b>Mi proceso</b><br><span class="small muted">Mira cómo has ido evolucionando.</span></span></button>
+ </div>
+ ${mine.length?`<div class="card"><h3>Mis citas</h3><div class="list" style="margin-top:10px">${mine.map(a=>`<div class="row between"><span><b>${a.dep}</b><br><span class="small muted">${a.when}</span></span><span class="pill ${a.st==='Confirmada'?'p-ok':'p-high'}">${a.st}</span></div>`).join('')}</div></div>`:''}
+ ${helpMini()}</div>`;
+}
+function roomsV(){
+ if(!S.room)return `<div class="wrap"><div><h1>Salas de chat</h1><p class="muted">Anónimas y moderadas. Elige una sala por tema.</p></div><div class="list">${ROOMS.map(r=>`<button class="item" data-act="room" data-v="${r.id}"><span class="ico">${ic('rooms')}</span><span style="flex:1"><b>${r.name}</b><br><span class="small muted">${r.desc}</span></span><span class="xs muted">${r.n} personas</span></button>`).join('')}</div></div>`;
+ const r=ROOMS.find(x=>x.id===S.room);const log=S.roomLog[r.id]||[];
+ return `<div class="wrap"><div class="row"><button class="btn sm" data-act="room" data-v="">← Salas</button><h2>${r.name}</h2><span class="pill p-ok">Moderada</span></div>
+ <div class="hint"><b>Demo:</b> escribe una frase de riesgo, por ejemplo “me quiero hacer daño”, para ver cómo reacciona el sistema.</div>
+ <div class="chat" aria-live="polite"><div class="msg sys">Aquí eres ${ME.alias}. Sé amable y respeta a los demás. Los moderadores pueden retirar mensajes dañinos.</div>
+ ${r.seed.map(m=>`<div class="msg"><div class="who">${m[0]}</div>${esc(m[1])}</div>`).join('')}
+ ${log.map(m=>m.sys?`<div class="msg sys" style="border:0;padding:0;width:100%">${m.crisis?helpBox():m.x}</div>`:`<div class="msg me"><div class="who">${m.a} (tú)</div>${esc(m.x)}</div>`).join('')}</div>
+ <form class="composer" data-form="room"><label class="sr" for="msg" style="position:absolute;left:-9999px">Mensaje</label><input id="msg" autocomplete="off" placeholder="Escribe a la sala como ${ME.alias}"><button class="btn primary" aria-label="Enviar">${ic('send').replace('<svg','<svg width="20" height="20"')}</button></form></div>`;
+}
+function aiV(){
+ return `<div class="wrap"><div class="row between"><div><h1>Consejera IA</h1><p class="muted small">Esta conversación también ayuda a construir tu perfil.</p></div><span class="pill p-n">Inteligencia artificial</span></div>
+ <div class="hint"><b>Demo:</b> prueba “tengo ansiedad”, “quiero agendar una cita” o una frase de riesgo.</div>
+ <div class="chat" aria-live="polite">${S.ai.map((m,i)=>`<div class="msg ${m.t==='me'?'me':'ai'}"><div class="who">${m.t==='me'?'Tú':'Consejera IA'}</div>${esc(m.x)}${m.crisis?'<div style="margin-top:8px">'+helpBox()+'</div>':''}${m.chips&&i===S.ai.length-1?`<div class="chips" style="margin-top:8px">${m.chips.map(c=>`<button class="chip" data-act="chip" data-v="${esc(c)}">${esc(c)}</button>`).join('')}</div>`:''}</div>`).join('')}</div>
+ <form class="composer" data-form="ai"><label for="msg" style="position:absolute;left:-9999px">Mensaje</label><input id="msg" autocomplete="off" placeholder="Cuéntame cómo te sientes"><button class="btn primary" aria-label="Enviar">${ic('send').replace('<svg','<svg width="20" height="20"')}</button></form></div>`;
+}
+function processV(){
+ const [tt,tc]=trendTxt(ME.series);
+ return `<div class="wrap"><div><h1>Mi proceso</h1><p class="muted">Solo tú, y los profesionales de bienestar si es necesario, ven esto.</p></div>
+ <div class="card"><div class="row between"><h3>Mi ánimo por semana</h3><span class="pill ${tc}">${tt}</span></div>${chart(ME.series)}<p class="xs muted">Escala de 1 a 5 estimada a partir de tus conversaciones. No es un diagnóstico.</p></div>
+ <div class="card"><h3 style="margin-bottom:12px">Resumen de mis semanas</h3><ul class="tl">${ME.weekly.map(w=>`<li><b class="small">${w[0]}</b><p class="small muted">${w[1]}</p></li>`).join('')}</ul></div></div>`;
+}
+
+/* ---------- Vistas: profesional ---------- */
+function panelV(){
+ const open=S.alerts.filter(a=>a.st!=='Resuelta');
+ const a=S.alerts.find(x=>x.id===S.sel)||S.alerts[0];
+ return `<div class="wrap"><div><h1>Panel de seguimiento</h1><p class="muted">Solo ves resúmenes y alertas. Un profesional revisa cada alerta antes de actuar.</p></div>
+ <div class="grid2"><div class="card tile"><span class="n" style="color:var(--crit)">${open.filter(x=>x.lvl==='crit').length}</span><span class="small muted">Alertas críticas</span></div>
+ <div class="card tile"><span class="n">${open.length}</span><span class="small muted">Alertas abiertas</span></div>
+ <div class="card tile"><span class="n">${STUDENTS.length+1}</span><span class="small muted">Estudiantes en seguimiento</span></div></div>
+ <div class="list">${S.alerts.map(x=>{const s=x.sid==='me'?{name:ME.name}:stu(x.sid);const l=LV[x.lvl];return `<button class="item ${x.id===a.id?'sel':''}" data-act="sel" data-v="${x.id}"><span class="stripe ${l[2]}"></span><span style="flex:1"><b>${s.name}</b> <span class="pill ${l[1]}">${l[0]}</span><br><span class="small muted">${x.src} · ${x.when}</span></span><span class="pill p-n">${x.st}</span></button>`;}).join('')}</div>
+ ${a?detailV(a):''}</div>`;
+}
+function detailV(a){
+ const me=a.sid==='me';const s=me?{name:ME.name,prog:'Ing. Electrónica',sem:8,alias:ME.alias,series:ME.series,events:[['Ahora','Alerta generada desde '+a.src+'.',1]]}:stu(a.sid);
+ const l=LV[a.lvl];const [tt,tc]=trendTxt(s.series);
+ return `<div class="card" style="display:flex;flex-direction:column;gap:14px"><div class="row between"><div><h2>${s.name}</h2><p class="small muted">${s.prog} · Semestre ${s.sem} · Alias en salas: ${s.alias}</p></div><span class="pill ${l[1]}">${l[0]}</span></div>
+ <div style="background:var(--bg);border-radius:10px;padding:10px 12px"><p class="xs muted">Fragmento detectado por la IA · ${a.src}</p><p>${esc(a.ex)}</p></div>
+ <div><div class="row between"><h3>Ánimo por semana</h3><span class="pill ${tc}">${tt}</span></div>${chart(s.series,170)}</div>
+ <div><h3 style="margin-bottom:10px">Línea de tiempo</h3><ul class="tl">${s.events.map(e=>`<li class="${e[2]?'c':''}"><b class="small">${e[0]}</b><p class="small muted">${e[1]}</p></li>`).join('')}</ul></div>
+ ${S.slotFor===a.id?`<div><label>Dependencia y horario para la cita</label><div class="chips">${[DEPS.ps,DEPS.si].map(d=>SLOTS.slice(0,2).map(t=>`<button class="chip" data-act="book" data-d="${d}" data-t="${t}">${d} · ${t}</button>`).join('')).join('')}</div></div>`:`<div class="row"><button class="btn primary" data-act="contact" data-v="${a.id}">Contactar y agendar cita</button><button class="btn" data-act="resolve" data-v="${a.id}">Marcar como revisada</button></div>`}
+ <p class="xs muted">Cada acción queda registrada en la bitácora de auditoría.</p></div>`;
+}
+function citasV(){
+ return `<div class="wrap"><div><h1>Citas</h1><p class="muted">Solicitadas por estudiantes o gestionadas por el equipo.</p></div><div class="list">${S.appts.map(a=>`<div class="item"><span class="ico">${ic('cal')}</span><span style="flex:1"><b>${a.who}</b><br><span class="small muted">${a.dep} · ${a.when}</span></span><span class="pill ${a.st==='Confirmada'?'p-ok':'p-high'}">${a.st}</span></div>`).join('')}</div></div>`;
+}
+
+/* ---------- Vistas: docente ---------- */
+const SIGNALS=['Ausencias frecuentes','Cambios bruscos de comportamiento','Aislamiento del grupo','Comentarios preocupantes','Bajo rendimiento repentino'];
+function referV(){
+ return `<div class="wrap"><div><h1>Remitir una preocupación</h1><p class="muted">Tu aviso llega al equipo de bienestar. Ellos decidirán cómo acompañar. Por privacidad, no verás el perfil del estudiante ni lo que pase después.</p></div>
+ <form class="card" data-form="refer" style="display:flex;flex-direction:column;gap:14px"><div><label for="st">Estudiante</label><select id="st">${STUDENTS.map(s=>`<option value="${s.id}">${s.name} · ${s.prog}</option>`).join('')}</select></div>
+ <div><label>¿Qué has observado?</label><div class="list">${SIGNALS.map((x,i)=>`<label style="font-weight:400;display:flex;gap:8px;align-items:center"><input type="checkbox" name="sig" value="${x}" id="sg${i}"> ${x}</label>`).join('')}</div></div>
+ <div><label for="co">Comentario (opcional)</label><textarea id="co" placeholder="Describe brevemente lo que viste."></textarea></div>
+ <div class="row"><button class="btn primary" type="submit">Enviar al equipo de bienestar</button></div></form></div>`;
+}
+function guideV(){
+ const g=[['Acércate en privado','Busca un momento tranquilo. Empieza por lo que observaste, sin juzgar: “He notado que últimamente…”.'],['Escucha más de lo que hablas','No hace falta resolver nada. Preguntar “¿cómo estás de verdad?” y esperar ya ayuda.'],['Si hay riesgo, no lo guardes','Si el estudiante habla de hacerse daño, no te quedes con eso: remite el caso al equipo y ofrece la Línea 106.'],['Cuida tu lugar','Tu rol es acompañar y derivar, no tratar. Respetar ese límite protege al estudiante y a ti.']];
+ return `<div class="wrap"><div><h1>Guía para docentes</h1><p class="muted">Cómo acercarte a un estudiante que parece estar pasándola mal.</p></div><div class="list">${g.map(x=>`<div class="card"><h3>${x[0]}</h3><p class="small muted" style="margin-top:4px">${x[1]}</p></div>`).join('')}</div></div>`;
+}
+
+/* ---------- Armado ---------- */
+const NAV={student:[['home','Inicio','home'],['rooms','Salas','rooms'],['ai','Consejera','ai'],['process','Mi proceso','proc']],
+ pro:[['panel','Panel','panel'],['citas','Citas','cal']],teacher:[['refer','Remitir','heart'],['guide','Guía','book']]};
+const START={student:'home',pro:'panel',teacher:'refer'};
+function view(){
+ const r=S.role,v=S.view;
+ if(r==='student'){
+  if(!S.consent)return consentView();
+  if(S.consent==='limited'&&v!=='home')return limited();
+  return {home:homeV,rooms:roomsV,ai:aiV,process:processV}[v]();
+ }
+ if(r==='pro')return {panel:panelV,citas:citasV}[v]();
+ return {refer:referV,guide:guideV}[v]();
+}
+function render(keep){
+ const nav=NAV[S.role];
+ const btns=nav.map(n=>`<button class="nav-btn" data-act="go" data-v="${n[0]}" ${S.view===n[0]?'aria-current="page"':''}>${ic(n[2])}<span>${n[1]}</span></button>`).join('');
+ const showNav=!(S.role==='student'&&!S.consent);
+ const main=$('main'),top=main?main.scrollTop:0;
+ $('#app').innerHTML=`<header class="top"><div class="brand"><span class="logo">S</span>SIBE</div>
+ <div class="demo"><span>Vista de demo</span><div class="seg" role="group" aria-label="Cambiar rol">${[['student','Estudiante'],['pro','Profesional'],['teacher','Docente']].map(x=>`<button data-act="role" data-v="${x[0]}" aria-pressed="${S.role===x[0]}">${x[1]}</button>`).join('')}</div></div></header>
+ <div class="body"><nav class="side" aria-label="Principal">${showNav?btns:''}</nav><main>${view()}</main></div>
+ <nav class="bottom" aria-label="Principal">${showNav?btns:''}</nav>${S.toast?`<div class="toast" role="status">${S.toast}</div>`:''}`;
+ const m=$('main');
+ if(keep){const c=m.querySelector('.chat');if(c)m.scrollTop=m.scrollHeight;else m.scrollTop=top;const i=$('#msg');if(i)i.focus();}
+}
+
+/* ---------- Eventos ---------- */
+document.addEventListener('click',e=>{
+ const b=e.target.closest('[data-act]');if(!b)return;
+ const a=b.dataset.act,v=b.dataset.v;
+ if(a==='role'){S.role=v;S.view=START[v];S.room=null;render();}
+ else if(a==='go'){S.view=v;S.room=null;render();$('main').scrollTop=0;}
+ else if(a==='consent'){S.consent=v;S.view='home';render();}
+ else if(a==='mood'){toast('Gracias por contarlo. Tu chequeo quedó guardado.');}
+ else if(a==='room'){S.room=v||null;render();$('main').scrollTop=0;}
+ else if(a==='chip'){chipClick(v);}
+ else if(a==='sel'){S.sel=v;S.slotFor=null;render(true);}
+ else if(a==='contact'){S.slotFor=v;render(true);}
+ else if(a==='resolve'){S.alerts.find(x=>x.id===v).st='Resuelta';render(true);toast('Alerta marcada como revisada.');}
+ else if(a==='book'){const al=S.alerts.find(x=>x.id===S.slotFor);const nm=al.sid==='me'?ME.name:stu(al.sid).name;S.appts.unshift({who:nm,dep:b.dataset.d,when:b.dataset.t,st:'Solicitada'});al.st='En gestión';S.slotFor=null;render(true);toast('Cita solicitada. Se notificó al estudiante.');}
+});
+document.addEventListener('submit',e=>{
+ e.preventDefault();const f=e.target.dataset.form;
+ if(f==='room')send('room');
+ else if(f==='ai')send('ai');
+ else if(f==='refer'){
+  const sid=$('#st').value;const sig=[...document.querySelectorAll('input[name=sig]:checked')].map(x=>x.value);const co=$('#co').value.trim();
+  addAlert(sid,'med','Remisión de docente',(sig.length?sig.join(', ')+'. ':'')+(co||'Sin comentarios adicionales.'));
+  toast('Enviado al equipo de bienestar. Gracias por avisar.');
+ }
+});
+render();
+</script>
+</body>
+</html>
