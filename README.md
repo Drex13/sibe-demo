@@ -15,14 +15,9 @@ Este repositorio contiene una **demo navegable**. Todo funciona en el navegador,
 
 ## Qué muestra la demo
 
-Hay dos versiones con la misma lógica y distinto estilo visual:
+La versión actual es la **1.1** ([`index.html`](index.html)). Es una sola página con un estilo visual colorido y cercano, pensado para estudiantes, que permite recorrer los tres roles del sistema.
 
-| Versión | Carpeta | Estilo |
-|---|---|---|
-| Joven | [`joven/`](joven/) | Colorida y cercana, pensada para estudiantes |
-| Clásica | [`clasica/`](clasica/) | Sobria y serena, con un tono institucional |
-
-La portada ([`index.html`](index.html)) enlaza a las dos.
+Enlace: https://drex13.github.io/sibe-demo/
 
 ## Cómo recorrerla
 
